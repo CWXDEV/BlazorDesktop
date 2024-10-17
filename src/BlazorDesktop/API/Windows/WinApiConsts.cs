@@ -16,4 +16,6 @@ public class WinApiConsts
     public const int WS_EX_CONTROLPARENT = 0x00010000;
     public const int WS_EX_APPWINDOW = 0x00040000;
     public const int WS_EX_TOPMOST = 0x00000008;
+    public const int SM_CXSCREEN = 0;
+    public const int SM_CYSCREEN = 1;
 }

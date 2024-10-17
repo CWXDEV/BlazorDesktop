@@ -6,21 +6,20 @@ namespace TestWindow;
 
 public class Program
 {
-    [STAThread]
     public static void Main()
     {
         AppOptions appOptions = new AppOptions
         {
             Title = "null",
-            Height = 800,
-            Width = 600,
+            Width = 1280,
+            Height = 1024,
             DisableResize = false,
             Fullscreen = false,
             Frameless = false,
-            MinHeight = 0,
             MinWidth = 0,
-            MaxHeight = 0,
+            MinHeight = 0,
             MaxWidth = 0,
+            MaxHeight = 0,
             StartHidden = false,
             HideWindowOnClose = false,
             AlwaysOnTop = false,

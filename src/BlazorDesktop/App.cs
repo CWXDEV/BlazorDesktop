@@ -18,15 +18,26 @@ public class App
         AppOptions = appOptions;
     }
 
+    /// <summary>
+    /// Runs the application in a new thread with the specified <see cref="AppOptions"/>.
+    /// </summary>
+    /// <remarks>
+    /// This method creates a new <see cref="Thread"/>, sets its apartment state to STA,
+    /// and starts the thread. The thread initializes a new <see cref="WindowManager"/>,
+    /// creates a new window with the specified <see cref="AppOptions"/>,
+    /// initializes the window with the specified URL, and runs the message loop.
+    /// </remarks>
     public async Task Run()
     {
-        WindowManager manager = new WindowManager();
-        await manager.CreateWindow(AppOptions);
-        manager.InitializeAsync(AppOptions.Handle.Value, "https://www.bing.com", new Rectangle(0, 0, AppOptions.Width, AppOptions.Height));
-        manager.Run();
-        
-        // await WindowManager.CreateWindow(AppOptions);
-        // WindowManager.InitializeAsync(AppOptions.Handle.Value, "https://www.bing.com", new Rectangle(0, 0, 1200, 800));
-        // WindowManager.Run();
+        Thread thread = new Thread(async () =>
+        {
+            WindowManager manager = new WindowManager();
+            await manager.CreateWindow(AppOptions);
+            manager.InitializeAsync(AppOptions.Handle.Value, "https://www.bing.com");
+            manager.Run();
+        });
+
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
     }
 }
