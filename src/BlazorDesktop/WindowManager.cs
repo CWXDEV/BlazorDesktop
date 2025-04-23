@@ -5,14 +5,13 @@ using BlazorDesktop.Models;
 using BlazorDesktop.API.Windows;
 using BlazorDesktop.Models.User32;
 using BlazorDesktop.Options;
-using Microsoft.Web.WebView2.Core;
 
 namespace BlazorDesktop;
 
 public class WindowManager
 {
     private IntPtr handle;
-    private CoreWebView2Controller webViewController;
+    // private CoreWebView2Controller webViewController;
 
     /// <summary>
     /// Creates a new window based on the provided <see cref="AppOptions"/>.
@@ -88,15 +87,15 @@ public class WindowManager
     /// </remarks>
     public async Task InitializeAsync(IntPtr hwnd, string url)
     {
-        var webView2Environment = await CoreWebView2Environment.CreateAsync();
-        webViewController = await webView2Environment.CreateCoreWebView2ControllerAsync(hwnd);
-
-        var webView2 = webViewController.CoreWebView2;
-        webView2.Navigate(url);
-
-        // Set bounds
-        var bounds = GetClientSize(hwnd);
-        webViewController.Bounds = new Rectangle(0, 0, bounds.Width, bounds.Height);
+        // var webView2Environment = await CoreWebView2Environment.CreateAsync();
+        // webViewController = await webView2Environment.CreateCoreWebView2ControllerAsync(hwnd);
+        //
+        // var webView2 = webViewController.CoreWebView2;
+        // webView2.Navigate(url);
+        //
+        // // Set bounds
+        // var bounds = GetClientSize(hwnd);
+        // webViewController.Bounds = new Rectangle(0, 0, bounds.Width, bounds.Height);
     }
 
     /// <summary>
@@ -108,12 +107,12 @@ public class WindowManager
     /// </remarks>
     public void Resize()
     {
-        if (webViewController != null)
-        {
-            // get window size
-            var bounds = GetClientSize(handle);
-            webViewController.Bounds = new Rectangle(0, 0, bounds.Width, bounds.Height);
-        }
+        // if (webViewController != null)
+        // {
+        //     // get window size
+        //     var bounds = GetClientSize(handle);
+        //     webViewController.Bounds = new Rectangle(0, 0, bounds.Width, bounds.Height);
+        // }
     }
 
     /// <summary>
