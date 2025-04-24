@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorDesktop.Core", "BlazorDesktop\src\BlazorDesktop.Core\BlazorDesktop.Core.csproj", "{9A5D8CEA-0D5E-4EBB-B077-37AD17305CA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorDesktop.Win", "BlazorDesktop\src\BlazorDesktop.Win\BlazorDesktop.Win.csproj", "{44B2C309-EEE9-4F54-8886-665F419AAFB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorDesktop.Gtk", "BlazorDesktop\src\BlazorDesktop.Gtk\BlazorDesktop.Gtk.csproj", "{EE843897-271B-4754-B06B-A3E59A6628E7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A5D8CEA-0D5E-4EBB-B077-37AD17305CA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A5D8CEA-0D5E-4EBB-B077-37AD17305CA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A5D8CEA-0D5E-4EBB-B077-37AD17305CA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A5D8CEA-0D5E-4EBB-B077-37AD17305CA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44B2C309-EEE9-4F54-8886-665F419AAFB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44B2C309-EEE9-4F54-8886-665F419AAFB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44B2C309-EEE9-4F54-8886-665F419AAFB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44B2C309-EEE9-4F54-8886-665F419AAFB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE843897-271B-4754-B06B-A3E59A6628E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE843897-271B-4754-B06B-A3E59A6628E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE843897-271B-4754-B06B-A3E59A6628E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE843897-271B-4754-B06B-A3E59A6628E7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
