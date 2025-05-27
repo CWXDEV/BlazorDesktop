@@ -32,6 +32,11 @@ public class WindowManager
         }
 
         var exStyle = CS.CS_HREDRAW | CS.CS_VREDRAW;
+
+        if (appOptions.AlwaysOnTop)
+        {
+            exStyle |= WS_EX.WS_EX_TOPMOST;
+        }
         
         if (appOptions.ClientAreaTransparent)
         {

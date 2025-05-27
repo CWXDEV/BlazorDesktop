@@ -15,7 +15,8 @@ public class Program
             Height = 600,
             StartPosition = StartPosition.Center,
             Top = 99,
-            Left = 22
+            Left = 22,
+            AlwaysOnTop = false
         };
         
         var app = new BlazorApp(appOptions);
