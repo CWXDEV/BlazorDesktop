@@ -35,6 +35,7 @@ public class AppOptions
     public uint TitleTextColor = WindowManager.RGBToUInt(0, 0, 0);
     public uint TitleBarColor = WindowManager.RGBToUInt(255, 255, 255);
     public uint TitleBorderColor = WindowManager.RGBToUInt(255, 255, 255);
+    public bool HideTitleBar { get; set; } = false;
 
     // Extra's in Wails for Go github
 }

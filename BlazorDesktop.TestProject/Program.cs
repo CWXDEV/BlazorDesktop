@@ -22,12 +22,13 @@ public class Program
             MinWidth = 800,
             MaxHeight = 1000,
             MaxWidth = 1200,
-            ClientAreaTransparent = true,
+            ClientAreaTransparent = false,
             DarkMode = true,
             CustomTitleBar = false,
             TitleBarColor = WindowManager.RGBToUInt(69, 69, 69),
             TitleBorderColor = WindowManager.RGBToUInt(69, 69, 69),
             TitleTextColor = WindowManager.RGBToUInt(255, 255, 255),
+            HideTitleBar = true
         };
         
         var app = new BlazorApp(appOptions);
