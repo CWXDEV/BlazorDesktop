@@ -384,7 +384,7 @@ public record CS
 public record WS
 {
     public const int WS_OVERLAPPED = 0x00000000;
-    public const uint WS_POPUP = unchecked((uint) 0x80000000);
+    public const int WS_POPUP = unchecked((int) 0x80000000);
     public const int WS_CHILD = 0x40000000;
     public const int WS_MINIMIZE = 0x20000000;
     public const int WS_VISIBLE = 0x10000000;
@@ -406,8 +406,8 @@ public record WS
     public const int WS_TILED = 0x00000000;
     public const int WS_ICONIC = 0x20000000;
     public const int WS_SIZEBOX = 0x00040000;
-    public const uint WS_OVERLAPPEDWINDOW = 0x00000000 | 0x00C00000 | 0x00080000 | 0x00040000 | 0x00020000 | 0x00010000;
-    public const uint WS_POPUPWINDOW = unchecked((uint) 0x80000000 | 0x00800000 | 0x00080000);
+    public const int WS_OVERLAPPEDWINDOW = 0x00000000 | 0x00C00000 | 0x00080000 | 0x00040000 | 0x00020000 | 0x00010000;
+    public const int WS_POPUPWINDOW = unchecked((int) 0x80000000 | 0x00800000 | 0x00080000);
     public const int WS_CHILDWINDOW = 0x40000000;
 }
 
@@ -461,4 +461,12 @@ public record COLORREF
     public const int rgbBlue = 0x00FF0000;
     public const int rgbBlack = 0x00000000;
     public const int rgbWhite = 0x00FFFFFF;
+}
+
+public record RDW
+{
+    public const uint RDW_INVALIDATE = 0x0001;
+    public const uint RDW_UPDATENOW = 0x0100;
+    public const uint RDW_ERASE = 0x0004;
+    public const uint RDW_FRAME = 0x0400;
 }
