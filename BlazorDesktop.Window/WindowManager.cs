@@ -11,26 +11,17 @@ public class WindowManager
 {
     private IntPtr handle;
     // private CoreWebView2Controller webViewController;
-
-    /// <summary>
-    /// Creates a new window based on the provided <see cref="AppOptions"/>.
-    /// </summary>
-    /// <param name="appOptions">The options for configuring the window.</param>
-    /// <returns>An asynchronous task.</returns>
-    /// <remarks>
-    /// This method creates a new window using the specified options. It sets up the window class,
-    /// registers the class, creates the window, and handles any errors that may occur during the process.
-    /// </remarks>
+    
     public async Task CreateWindow(AppOptions appOptions)
     {
         WNDCLASSEX windowClass = new()
         {
             cbSize = (uint)Marshal.SizeOf(typeof(WNDCLASSEX)),
-            style = 0,
+            style = CS.CS_HREDRAW | CS.CS_VREDRAW,
             lpfnWndProc = Marshal.GetFunctionPointerForDelegate(new WndProcDelegate(WndProc)),
             hInstance = KERNAL32.GetModuleHandle(null),
             lpszClassName = appOptions.Title,
-            hbrBackground = GDI32.CreateSolidBrush(RGB(appOptions.BackgroundColour.Red, appOptions.BackgroundColour.Green, appOptions.BackgroundColour.Blue)),
+            hbrBackground =  GDI32.CreateSolidBrush(RGB(appOptions.BackgroundColour.Red, appOptions.BackgroundColour.Green, appOptions.BackgroundColour.Blue)), // wails does 15 + 1
         };
 
         var classAtom = USER32.RegisterClassEx(ref windowClass);
@@ -40,17 +31,31 @@ public class WindowManager
             return;
         }
 
-        var styles = WS_EX.WS_EX_LAYERED;
-
-        var test = GetScreenCentre(appOptions);
+        var exStyle = CS.CS_HREDRAW | CS.CS_VREDRAW;
+        
+        if (appOptions.ClientAreaTransparent)
+        {
+            exStyle |= WS_EX.WS_EX_NOREDIRECTIONBITMAP;
+        }
+        
+        var startingLocation = new Vector2(0, 0);
+        if (appOptions.StartPosition == StartPosition.Manual)
+        {
+            startingLocation.Y = appOptions.Top;
+            startingLocation.X = appOptions.Left;
+        }
+        else
+        {
+            startingLocation = GetScreenCentre(appOptions);
+        }
 
         handle = USER32.CreateWindowEx(
-            styles,
+            exStyle,
             appOptions.Title,
             appOptions.Title,
             WS.WS_OVERLAPPEDWINDOW | WS.WS_VISIBLE,
-            (int)test.X,
-            (int)test.Y,
+            (int)startingLocation.X,
+            (int)startingLocation.Y,
             appOptions.Width,
             appOptions.Height,
             IntPtr.Zero,
@@ -67,23 +72,18 @@ public class WindowManager
             Console.WriteLine($"Error creating window. Error Code: {errorCode}");
             return;
         }
-        
-        var colorkey = RGB(255, 0, 255);
-        
-        // // Set (whole window) window transparency (0 is fully transparent, 255 is fully opaque)
-        byte transparency = 255; // Semi-transparent
-        USER32.SetLayeredWindowAttributes(handle, colorkey, transparency, LWA.LWA_COLORKEY);
-        // windowClass.hbrBackground = GDI32.CreateSolidBrush(colorkey);
-        
-        var style = USER32.GetWindowLong(handle, GWL.GWL_STYLE);
-        var margins = new MARGINS
+
+        // currently does not work
+        if (appOptions.DarkMode)
         {
-            cxLeftWidth = -1,
-            cxRightWidth = -1,
-            cyTopHeight = -1,
-            cyBottomHeight = -1
-        };
-        DWM.DwmExtendFrameIntoClientArea(handle, ref margins);
+            Console.WriteLine("Dark mode enabled");
+            var winDark = 1;
+            DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaUseImmersiveDarkMode, ref winDark, winDark);
+            DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaCaptionColor, ref winDark, 255);
+            DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaTextColor, ref winDark, 255);
+            DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaBorderColor, ref winDark, 255);
+            
+        }
     }
     
     public void Resize()

@@ -18,8 +18,25 @@ public class AppOptions
     public int MaxWidth { get; set; } = 0;
     public bool StartHidden { get; set; } = false;
     public bool HideWindowOnClose { get; set; } = false;
+    public bool DarkMode { get; set; } = false;
+    public bool ClientAreaTransparent { get; set; } = false;
     public bool AlwaysOnTop { get; set; } = false;
-    public RGBA BackgroundColour { get; set; } = new() { Red = 0, Green = 0, Blue = 0, Alpha = 255 };
-    
+    public RGBA BackgroundColour { get; set; } = new()
+    {
+        Red = 0,
+        Green = 0,
+        Blue = 0,
+        Alpha = 255
+    };
+    public StartPosition StartPosition { get; set; } = StartPosition.Center;
+    public int Top { get; set; } = 0;
+    public int Left { get; set; } = 0;
+
     // Extra's in Wails for Go github
+}
+
+public enum StartPosition
+{
+    Center,
+    Manual
 }

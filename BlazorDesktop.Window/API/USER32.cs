@@ -58,4 +58,7 @@ public class USER32
     
     [DllImport("user32.dll", SetLastError = true)]
     public extern static bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+    
+    [DllImport("user32.dll", EntryPoint = "SetClassLongPtrW", SetLastError = true)]
+    public extern static IntPtr SetClassLongPtrW(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 }

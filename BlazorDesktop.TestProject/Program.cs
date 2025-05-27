@@ -11,19 +11,11 @@ public class Program
         var appOptions = new AppOptions
         {
             Title = "Testing Project for creating windows",
-            Width = 1280,
-            Height = 1024,
-            DisableResize = false,
-            Fullscreen = false,
-            Frameless = false,
-            MinWidth = 0,
-            MinHeight = 0,
-            MaxWidth = 0,
-            MaxHeight = 0,
-            StartHidden = false,
-            HideWindowOnClose = false,
-            AlwaysOnTop = false,
-            BackgroundColour = RGBA.NewRGBA(69, 69, 69, 255)
+            Width = 800,
+            Height = 600,
+            StartPosition = StartPosition.Center,
+            Top = 99,
+            Left = 22
         };
         
         var app = new BlazorApp(appOptions);

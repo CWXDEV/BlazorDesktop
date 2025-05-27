@@ -441,3 +441,13 @@ public record WS_EX
     public const int WS_EX_LAYOUTRTL = 0x00400000;
     public const int WS_EX_NOACTIVATE = 0x08000000;
 }
+
+public record DWMWA
+{
+    public const int DwmwaUseImmersiveDarkModeBefore20h1 = 19;
+    public const int DwmwaUseImmersiveDarkMode = 20;
+    public const int DwmwaBorderColor = 34;
+    public const int DwmwaCaptionColor = 35;
+    public const int DwmwaTextColor = 36;
+    public const int DwmwaSystemBackdropType = 38;
+}
