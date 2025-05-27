@@ -9,19 +9,27 @@ namespace BlazorDesktop.Window;
 
 public class WindowManager
 {
-    private IntPtr handle;
+    private IntPtr _handle;
+    private AppOptions _appOptions;
     // private CoreWebView2Controller webViewController;
-    
+
     public async Task CreateWindow(AppOptions appOptions)
     {
+        _appOptions = appOptions;
+
         WNDCLASSEX windowClass = new()
         {
-            cbSize = (uint)Marshal.SizeOf(typeof(WNDCLASSEX)),
+            cbSize = (uint) Marshal.SizeOf(typeof(WNDCLASSEX)),
             style = CS.CS_HREDRAW | CS.CS_VREDRAW,
             lpfnWndProc = Marshal.GetFunctionPointerForDelegate(new WndProcDelegate(WndProc)),
             hInstance = KERNAL32.GetModuleHandle(null),
             lpszClassName = appOptions.Title,
-            hbrBackground =  GDI32.CreateSolidBrush(RGB(appOptions.BackgroundColour.Red, appOptions.BackgroundColour.Green, appOptions.BackgroundColour.Blue)), // wails does 15 + 1
+            hbrBackground = GDI32.CreateSolidBrush(RGB(
+                    _appOptions.BackgroundColour.Red,
+                    _appOptions.BackgroundColour.Green,
+                    _appOptions.BackgroundColour.Blue
+                )
+            ), // wails does 15 + 1
         };
 
         var classAtom = USER32.RegisterClassEx(ref windowClass);
@@ -33,45 +41,45 @@ public class WindowManager
 
         var exStyle = CS.CS_HREDRAW | CS.CS_VREDRAW;
 
-        if (appOptions.AlwaysOnTop)
+        if (_appOptions.AlwaysOnTop)
         {
             exStyle |= WS_EX.WS_EX_TOPMOST;
         }
-        
-        if (appOptions.ClientAreaTransparent)
+
+        if (_appOptions.ClientAreaTransparent)
         {
             exStyle |= WS_EX.WS_EX_NOREDIRECTIONBITMAP;
         }
-        
+
         var startingLocation = new Vector2(0, 0);
-        if (appOptions.StartPosition == StartPosition.Manual)
+        if (_appOptions.StartPosition == StartPosition.Manual)
         {
-            startingLocation.Y = appOptions.Top;
-            startingLocation.X = appOptions.Left;
+            startingLocation.Y = _appOptions.Top;
+            startingLocation.X = _appOptions.Left;
         }
         else
         {
-            startingLocation = GetScreenCentre(appOptions);
+            startingLocation = GetScreenCentre(_appOptions);
         }
 
-        handle = USER32.CreateWindowEx(
+        _handle = USER32.CreateWindowEx(
             exStyle,
-            appOptions.Title,
-            appOptions.Title,
+            _appOptions.Title,
+            _appOptions.Title,
             WS.WS_OVERLAPPEDWINDOW | WS.WS_VISIBLE,
-            (int)startingLocation.X,
-            (int)startingLocation.Y,
-            appOptions.Width,
-            appOptions.Height,
+            (int) startingLocation.X,
+            (int) startingLocation.Y,
+            _appOptions.Width,
+            _appOptions.Height,
             IntPtr.Zero,
             IntPtr.Zero,
             windowClass.hInstance,
             IntPtr.Zero
         );
 
-        appOptions.Handle = handle;
+        _appOptions.Handle = _handle;
 
-        if (handle == IntPtr.Zero)
+        if (_handle == IntPtr.Zero)
         {
             var errorCode = KERNAL32.GetLastError(); // Get error code after window creation failure
             Console.WriteLine($"Error creating window. Error Code: {errorCode}");
@@ -79,23 +87,23 @@ public class WindowManager
         }
 
         // currently does not work
-        if (appOptions.DarkMode)
-        {
-            Console.WriteLine("Dark mode enabled");
-            var winDark = 1;
-            DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaUseImmersiveDarkMode, ref winDark, winDark);
-            DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaCaptionColor, ref winDark, 255);
-            DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaTextColor, ref winDark, 255);
-            DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaBorderColor, ref winDark, 255);
-            
-        }
+        // if (_appOptions.DarkMode)
+        // {
+        //     Console.WriteLine("Dark mode enabled");
+        //     var winDark = 1;
+        //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaUseImmersiveDarkMode, ref winDark, winDark);
+        //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaCaptionColor, ref winDark, 255);
+        //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaTextColor, ref winDark, 255);
+        //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaBorderColor, ref winDark, 255);
+        //     
+        // }
     }
-    
+
     public void Resize()
     {
-        
+
     }
-    
+
     public RECT GetClientSize(IntPtr hwnd)
     {
         RECT rect;
@@ -108,18 +116,18 @@ public class WindowManager
             throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
         }
     }
-    
-    public Vector2 GetScreenCentre(AppOptions appOptions)
+
+    public Vector2 GetScreenCentre(AppOptions _appOptions)
     {
         var width = USER32.GetSystemMetrics(SM.SM_CXSCREEN);
         var height = USER32.GetSystemMetrics(SM.SM_CYSCREEN);
-        var windowWidth = appOptions.Width / 2;
-        var windowHeight = appOptions.Height / 2;
+        var windowWidth = _appOptions.Width / 2;
+        var windowHeight = _appOptions.Height / 2;
         var x = width / 2 - windowWidth;
         var y = height / 2 - windowHeight;
         return new Vector2(x, y);
     }
-    
+
     public void Run()
     {
         MSG msg;
@@ -130,7 +138,7 @@ public class WindowManager
             USER32.DispatchMessage(ref msg);
         }
     }
-    
+
     private IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
         // Console.WriteLine($"WndProc called with hWnd: {msg}");
@@ -138,7 +146,7 @@ public class WindowManager
         {
             case WM.WM_PAINT:
                 PAINT ps;
-                IntPtr hdc = USER32.BeginPaint(hWnd, out ps);
+                var hdc = USER32.BeginPaint(hWnd, out ps);
                 USER32.EndPaint(hWnd, ref ps);
                 return IntPtr.Zero;
             case WM.WM_DESTROY:
@@ -147,15 +155,21 @@ public class WindowManager
             case WM.WM_SIZE:
                 Resize();
                 return IntPtr.Zero;
+            case WM.WM_GETMINMAXINFO:
+                var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
+                mmi.ptMinTrackSize.x = _appOptions.MinWidth;
+                mmi.ptMinTrackSize.y = _appOptions.MinHeight;
+                Marshal.StructureToPtr(mmi, lParam, true);
+                return IntPtr.Zero;
             default:
                 return USER32.DefWindowProc(hWnd, msg, wParam, lParam);
         }
     }
 
     private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-    
+
     private uint RGB(byte r, byte g, byte b)
     {
-        return (uint)(r | g << 8 | b << 16);
+        return (uint) (r | g << 8 | b << 16);
     }
 }

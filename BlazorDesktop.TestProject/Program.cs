@@ -16,7 +16,10 @@ public class Program
             StartPosition = StartPosition.Center,
             Top = 99,
             Left = 22,
-            AlwaysOnTop = false
+            AlwaysOnTop = false,
+            MinHeight = 600,
+            MinWidth = 800,
+            ClientAreaTransparent = true
         };
         
         var app = new BlazorApp(appOptions);
