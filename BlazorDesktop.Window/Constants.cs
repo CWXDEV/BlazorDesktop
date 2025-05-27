@@ -442,6 +442,8 @@ public record WS_EX
     public const int WS_EX_NOACTIVATE = 0x08000000;
 }
 
+// DWM window attributes
+// https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute
 public record DWMWA
 {
     public const int DwmwaUseImmersiveDarkModeBefore20h1 = 19;
@@ -450,4 +452,13 @@ public record DWMWA
     public const int DwmwaCaptionColor = 35;
     public const int DwmwaTextColor = 36;
     public const int DwmwaSystemBackdropType = 38;
+}
+
+public record COLORREF
+{
+    public const int rgbRed = 0x000000FF;
+    public const int rgbGreen = 0x0000FF00;
+    public const int rgbBlue = 0x00FF0000;
+    public const int rgbBlack = 0x00000000;
+    public const int rgbWhite = 0x00FFFFFF;
 }

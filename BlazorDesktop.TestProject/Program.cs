@@ -1,4 +1,5 @@
 ﻿using BlazorDesktop.Blazor;
+using BlazorDesktop.Window;
 using BlazorDesktop.Window.Models;
 using BlazorDesktop.Window.Options;
 
@@ -21,7 +22,12 @@ public class Program
             MinWidth = 800,
             MaxHeight = 1000,
             MaxWidth = 1200,
-            ClientAreaTransparent = true
+            ClientAreaTransparent = true,
+            DarkMode = true,
+            CustomTitleBar = false,
+            TitleBarColor = WindowManager.RGBToUInt(69, 69, 69),
+            TitleBorderColor = WindowManager.RGBToUInt(69, 69, 69),
+            TitleTextColor = WindowManager.RGBToUInt(255, 255, 255),
         };
         
         var app = new BlazorApp(appOptions);

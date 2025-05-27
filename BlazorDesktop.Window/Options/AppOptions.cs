@@ -31,6 +31,10 @@ public class AppOptions
     public StartPosition StartPosition { get; set; } = StartPosition.Center;
     public int Top { get; set; } = 0;
     public int Left { get; set; } = 0;
+    public bool CustomTitleBar { get; set; } = false;
+    public uint TitleTextColor = WindowManager.RGBToUInt(0, 0, 0);
+    public uint TitleBarColor = WindowManager.RGBToUInt(255, 255, 255);
+    public uint TitleBorderColor = WindowManager.RGBToUInt(255, 255, 255);
 
     // Extra's in Wails for Go github
 }

@@ -24,7 +24,7 @@ public class WindowManager
             lpfnWndProc = Marshal.GetFunctionPointerForDelegate(new WndProcDelegate(WndProc)),
             hInstance = KERNAL32.GetModuleHandle(null),
             lpszClassName = appOptions.Title,
-            hbrBackground = GDI32.CreateSolidBrush(RGB(
+            hbrBackground = GDI32.CreateSolidBrush(RGBToUInt(
                     _appOptions.BackgroundColour.Red,
                     _appOptions.BackgroundColour.Green,
                     _appOptions.BackgroundColour.Blue
@@ -81,21 +81,27 @@ public class WindowManager
 
         if (_handle == IntPtr.Zero)
         {
-            var errorCode = KERNAL32.GetLastError(); // Get error code after window creation failure
+            var errorCode = KERNAL32.GetLastError();
             Console.WriteLine($"Error creating window. Error Code: {errorCode}");
             return;
         }
+        
+        if (_appOptions.DarkMode)
+        {
+            Console.WriteLine("Dark mode enabled");
+            var winDark = 1;
+            DWM.DwmSetWindowAttribute(_handle, DWMWA.DwmwaUseImmersiveDarkMode, ref winDark, sizeof(uint));
+        }
 
-        // currently does not work
-        // if (_appOptions.DarkMode)
-        // {
-        //     Console.WriteLine("Dark mode enabled");
-        //     var winDark = 1;
-        //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaUseImmersiveDarkMode, ref winDark, winDark);
-        //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaCaptionColor, ref winDark, 255);
-        //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaTextColor, ref winDark, 255);
-        //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaBorderColor, ref winDark, 255);
-        // }
+        if (_appOptions.CustomTitleBar)
+        {
+            var titleBarColor = (int) _appOptions.TitleBarColor;
+            var titleTextColor = (int) _appOptions.TitleTextColor;
+            var titleBorderColor = (int) _appOptions.TitleBorderColor;
+            DWM.DwmSetWindowAttribute(_handle, DWMWA.DwmwaCaptionColor, ref titleBarColor, sizeof(uint));
+            DWM.DwmSetWindowAttribute(_handle, DWMWA.DwmwaTextColor, ref titleTextColor, sizeof(uint));
+            DWM.DwmSetWindowAttribute(_handle, DWMWA.DwmwaBorderColor, ref titleBorderColor, sizeof(uint));
+        }
     }
 
     public void Resize()
@@ -103,18 +109,18 @@ public class WindowManager
 
     }
 
-    public RECT GetClientSize(IntPtr hwnd)
-    {
-        RECT rect;
-        if (USER32.GetClientRect(hwnd, out rect))
-        {
-            return rect; // Contains width and height of the client area
-        }
-        else
-        {
-            throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
-        }
-    }
+    // public RECT GetClientSize(IntPtr hwnd)
+    // {
+    //     RECT rect;
+    //     if (USER32.GetClientRect(hwnd, out rect))
+    //     {
+    //         return rect; // Contains width and height of the client area
+    //     }
+    //     else
+    //     {
+    //         throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+    //     }
+    // }
 
     public Vector2 GetScreenCentre(AppOptions _appOptions)
     {
@@ -167,7 +173,7 @@ public class WindowManager
 
     private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
-    private uint RGB(byte r, byte g, byte b)
+    public static uint RGBToUInt(byte r, byte g, byte b)
     {
         return (uint) (r | g << 8 | b << 16);
     }
