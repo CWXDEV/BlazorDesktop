@@ -95,7 +95,6 @@ public class WindowManager
         //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaCaptionColor, ref winDark, 255);
         //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaTextColor, ref winDark, 255);
         //     DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaBorderColor, ref winDark, 255);
-        //     
         // }
     }
 
@@ -123,9 +122,9 @@ public class WindowManager
         var height = USER32.GetSystemMetrics(SM.SM_CYSCREEN);
         var windowWidth = _appOptions.Width / 2;
         var windowHeight = _appOptions.Height / 2;
-        var x = width / 2 - windowWidth;
-        var y = height / 2 - windowHeight;
-        return new Vector2(x, y);
+        var left = width / 2 - windowWidth;
+        var top = height / 2 - windowHeight;
+        return new Vector2(left, top);
     }
 
     public void Run()
@@ -133,7 +132,6 @@ public class WindowManager
         MSG msg;
         while (USER32.GetMessage(out msg, IntPtr.Zero, 0, 0))
         {
-            // Console.WriteLine($"GetMessage called with hWnd: {msg.hwnd}");
             USER32.TranslateMessage(ref msg);
             USER32.DispatchMessage(ref msg);
         }
@@ -141,7 +139,6 @@ public class WindowManager
 
     private IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
-        // Console.WriteLine($"WndProc called with hWnd: {msg}");
         switch (msg)
         {
             case WM.WM_PAINT:
@@ -159,6 +156,8 @@ public class WindowManager
                 var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
                 mmi.ptMinTrackSize.x = _appOptions.MinWidth;
                 mmi.ptMinTrackSize.y = _appOptions.MinHeight;
+                mmi.ptMaxTrackSize.x = _appOptions.MaxWidth;
+                mmi.ptMaxTrackSize.y = _appOptions.MaxHeight;
                 Marshal.StructureToPtr(mmi, lParam, true);
                 return IntPtr.Zero;
             default:

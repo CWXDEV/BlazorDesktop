@@ -19,6 +19,8 @@ public class Program
             AlwaysOnTop = false,
             MinHeight = 600,
             MinWidth = 800,
+            MaxHeight = 1000,
+            MaxWidth = 1200,
             ClientAreaTransparent = true
         };
         
