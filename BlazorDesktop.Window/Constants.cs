@@ -381,6 +381,7 @@ public record CS
 }
 
 // Window style constants
+// https://learn.microsoft.com/en-us/windows/win32/winmsg/window-styles
 public record WS
 {
     public const int WS_OVERLAPPED = 0x00000000;
@@ -412,6 +413,7 @@ public record WS
 }
 
 // Extended window style constants
+// https://learn.microsoft.com/en-us/windows/win32/winmsg/extended-window-styles
 public record WS_EX
 {
     public const int WS_EX_DLGMODALFRAME = 0x00000001;
@@ -463,6 +465,7 @@ public record COLORREF
     public const int rgbWhite = 0x00FFFFFF;
 }
 
+// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-redrawwindow
 public record RDW
 {
     public const uint RDW_INVALIDATE = 0x0001;
