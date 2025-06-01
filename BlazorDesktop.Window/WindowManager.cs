@@ -143,7 +143,6 @@ public class WindowManager
                 USER32.PostQuitMessage(0);
                 return IntPtr.Zero;
             case WM.WM_SIZE:
-                Resize();
                 return IntPtr.Zero;
             case WM.WM_GETMINMAXINFO:
                 var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
@@ -168,8 +167,5 @@ public class WindowManager
             default:
                 return USER32.DefWindowProc(hWnd, msg, wParam, lParam);
         }
-    }
-
-    {
     }
 }
