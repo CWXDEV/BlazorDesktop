@@ -6,6 +6,7 @@ namespace BlazorDesktop.Blazor;
 public class BlazorApp
 {
     public AppOptions? AppOptions { get; set; }
+    public IntPtr? WindowHandle { get; set; }
     
     public BlazorApp()
     {
@@ -22,7 +23,7 @@ public class BlazorApp
         var thread = new Thread(async () =>
         {
             var manager = new WindowManager();
-            await manager.CreateWindow(AppOptions);
+            WindowHandle = await manager.CreateWindow(AppOptions);
             manager.Run();
         });
 

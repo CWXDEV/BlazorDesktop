@@ -4,6 +4,7 @@ using BlazorDesktop.Window.API;
 using BlazorDesktop.Window.Constants;
 using BlazorDesktop.Window.Models;
 using BlazorDesktop.Window.Options;
+using BlazorDesktop.Window.Helpers;
 
 namespace BlazorDesktop.Window;
 
@@ -12,125 +13,111 @@ public class WindowManager
     private IntPtr _handle;
     private AppOptions _appOptions;
     // private CoreWebView2Controller webViewController;
+    private int _currentCornerRadius = 8;
+    private uint _currentBorderColor = 0x808080;
+    private int _currentBorderWidth = 1;
 
-    public async Task CreateWindow(AppOptions appOptions)
+    public async Task<IntPtr> CreateWindow(AppOptions appOptions)
     {
         _appOptions = appOptions;
-
-        WNDCLASSEX windowClass = new()
+        
+        
+        if (_appOptions.BackgroundColour is null)
         {
-            cbSize = (uint) Marshal.SizeOf(typeof(WNDCLASSEX)),
-            style = CS.CS_HREDRAW | CS.CS_VREDRAW,
-            lpfnWndProc = Marshal.GetFunctionPointerForDelegate(new WndProcDelegate(WndProc)),
-            hInstance = KERNAL32.GetModuleHandle(null),
-            lpszClassName = appOptions.Title,
-            hbrBackground = GDI32.CreateSolidBrush(RGBToUInt(
-                    _appOptions.BackgroundColour.Red,
-                    _appOptions.BackgroundColour.Green,
-                    _appOptions.BackgroundColour.Blue
-                )
-            ), // wails does 15 + 1
-        };
+            Console.WriteLine("AppOptions does not have a BackgroundColour Defined, Setting to 0, 0, 0");
+            _appOptions.BackgroundColour = new RGB(0, 0, 0);
+        }
 
-        var classAtom = USER32.RegisterClassEx(ref windowClass);
+        var windowClass = Win32Helper.CreateWindowClass(
+            WndProc,
+            _appOptions.Title,
+            _appOptions.BackgroundColour
+        );
+
+        var classAtom = Win32Helper.RegisterWindowClass(ref windowClass);
         if (classAtom == 0)
         {
             Console.WriteLine("Error registering window class.");
-            return;
+            return IntPtr.Zero;
         }
 
         var exStyle = CS.CS_HREDRAW | CS.CS_VREDRAW;
-
         if (_appOptions.AlwaysOnTop)
         {
             exStyle |= WS_EX.WS_EX_TOPMOST;
         }
-
         if (_appOptions.ClientAreaTransparent)
         {
             exStyle |= WS_EX.WS_EX_NOREDIRECTIONBITMAP;
         }
 
-        var startingLocation = new Vector2(0, 0);
+        var startingLocation = new POINT(0, 0);
         if (_appOptions.StartPosition == StartPosition.Manual)
         {
-            startingLocation.Y = _appOptions.Top;
-            startingLocation.X = _appOptions.Left;
+            if (_appOptions.Top is not null)
+            {
+                startingLocation.Y = _appOptions.Top.Value;
+            }
+
+            if (_appOptions.Left is not null)
+            {
+                startingLocation.X = _appOptions.Left.Value;
+            }
         }
         else
         {
-            startingLocation = GetScreenCentre(_appOptions);
+            startingLocation = Win32Helper.GetScreenCentre(_appOptions);
         }
 
-        _handle = USER32.CreateWindowEx(
+        var dwStyle = WS.WS_OVERLAPPEDWINDOW | WS.WS_VISIBLE;
+        
+        if (_appOptions.Frameless)
+        {
+            dwStyle &= ~WS.WS_OVERLAPPEDWINDOW;
+            dwStyle |= WS.WS_POPUP | WS.WS_VISIBLE | WS.WS_CLIPSIBLINGS | WS.WS_CLIPCHILDREN;
+        }
+
+        _handle = Win32Helper.CreateWindowHandle(
             exStyle,
-            _appOptions.Title,
-            _appOptions.Title,
-            WS.WS_OVERLAPPEDWINDOW | WS.WS_VISIBLE,
-            (int) startingLocation.X,
-            (int) startingLocation.Y,
-            _appOptions.Width,
-            _appOptions.Height,
-            IntPtr.Zero,
-            IntPtr.Zero,
-            windowClass.hInstance,
-            IntPtr.Zero
+            _appOptions,
+            dwStyle,
+            startingLocation,
+            windowClass.hInstance
         );
 
         _appOptions.Handle = _handle;
 
         if (_handle == IntPtr.Zero)
         {
-            var errorCode = KERNAL32.GetLastError();
+            var errorCode = Win32Helper.LastError();
             Console.WriteLine($"Error creating window. Error Code: {errorCode}");
-            return;
+            return IntPtr.Zero;
         }
-        
-        if (_appOptions.DarkMode)
-        {
-            Console.WriteLine("Dark mode enabled");
-            var winDark = 1;
-            DWM.DwmSetWindowAttribute(_handle, DWMWA.DwmwaUseImmersiveDarkMode, ref winDark, sizeof(uint));
-        }
+
+        Win32Helper.SetDarkMode(_handle, _appOptions.DarkMode);
 
         if (_appOptions.CustomTitleBar)
         {
-            var titleBarColor = (int) _appOptions.TitleBarColor;
-            var titleTextColor = (int) _appOptions.TitleTextColor;
-            var titleBorderColor = (int) _appOptions.TitleBorderColor;
-            DWM.DwmSetWindowAttribute(_handle, DWMWA.DwmwaCaptionColor, ref titleBarColor, sizeof(uint));
-            DWM.DwmSetWindowAttribute(_handle, DWMWA.DwmwaTextColor, ref titleTextColor, sizeof(uint));
-            DWM.DwmSetWindowAttribute(_handle, DWMWA.DwmwaBorderColor, ref titleBorderColor, sizeof(uint));
+            if (_appOptions.TitleBarColor is not null)
+            {
+                Win32Helper.SetTitleBarCaptionColor(_handle, _appOptions.TitleBarColor);
+            }
+
+            if (_appOptions.TitleTextColor is not null)
+            {
+                Win32Helper.SetTitleBarTextColor(_handle, _appOptions.TitleTextColor);
+            }
+
+            if (_appOptions.TitleBorderColor is not null)
+            {
+                Win32Helper.SetTitleBarBorderColor(_handle, _appOptions.TitleBorderColor);
+            }
         }
-    }
-
-    public void Resize()
-    {
-
-    }
-
-    // public RECT GetClientSize(IntPtr hwnd)
-    // {
-    //     RECT rect;
-    //     if (USER32.GetClientRect(hwnd, out rect))
-    //     {
-    //         return rect; // Contains width and height of the client area
-    //     }
-    //     else
-    //     {
-    //         throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
-    //     }
-    // }
-
-    public Vector2 GetScreenCentre(AppOptions _appOptions)
-    {
-        var width = USER32.GetSystemMetrics(SM.SM_CXSCREEN);
-        var height = USER32.GetSystemMetrics(SM.SM_CYSCREEN);
-        var windowWidth = _appOptions.Width / 2;
-        var windowHeight = _appOptions.Height / 2;
-        var left = width / 2 - windowWidth;
-        var top = height / 2 - windowHeight;
-        return new Vector2(left, top);
+        
+        USER32.ShowWindow(_handle, SW.SW_SHOW);
+        USER32.UpdateWindow(_handle);
+        
+        return _handle;
     }
 
     public void Run()
@@ -160,10 +147,22 @@ public class WindowManager
                 return IntPtr.Zero;
             case WM.WM_GETMINMAXINFO:
                 var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
-                mmi.ptMinTrackSize.x = _appOptions.MinWidth;
-                mmi.ptMinTrackSize.y = _appOptions.MinHeight;
-                mmi.ptMaxTrackSize.x = _appOptions.MaxWidth;
-                mmi.ptMaxTrackSize.y = _appOptions.MaxHeight;
+                if (_appOptions.MinHeight is not null)
+                {
+                    mmi.ptMinTrackSize.Y = _appOptions.MinHeight.Value;
+                }
+                if (_appOptions.MinWidth is not null)
+                {
+                    mmi.ptMinTrackSize.X = _appOptions.MinWidth.Value;
+                }
+                if (_appOptions.MaxWidth is not null)
+                {
+                    mmi.ptMaxTrackSize.X = _appOptions.MaxWidth.Value;
+                }
+                if (_appOptions.MaxHeight is not null)
+                {
+                    mmi.ptMaxTrackSize.Y = _appOptions.MaxHeight.Value;
+                }
                 Marshal.StructureToPtr(mmi, lParam, true);
                 return IntPtr.Zero;
             default:
@@ -171,10 +170,6 @@ public class WindowManager
         }
     }
 
-    private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-
-    public static uint RGBToUInt(byte r, byte g, byte b)
     {
-        return (uint) (r | g << 8 | b << 16);
     }
 }

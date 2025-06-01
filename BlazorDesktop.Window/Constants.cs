@@ -473,3 +473,24 @@ public record RDW
     public const uint RDW_ERASE = 0x0004;
     public const uint RDW_FRAME = 0x0400;
 }
+
+public record HT
+{
+    public const int HTNOWHERE = 0;
+    public const int HTCLIENT = 1;
+    public const int HTCAPTION = 2;
+    public const int HTSYSMENU = 3;
+    public const int HTGROWBOX = 4;
+    public const int HTMENU = 5;
+    public const int HTHSCROLL = 6;
+    public const int HTVSCROLL = 7;
+    public const int HTMINBUTTON = 8;
+    public const int HTLEFT = 10;          // Left border (horizontal resize cursor)
+    public const int HTRIGHT = 11;         // Right border (horizontal resize cursor)  
+    public const int HTTOP = 12;           // Top border (vertical resize cursor)
+    public const int HTTOPLEFT = 13;       // Top-left corner (diagonal resize cursor)
+    public const int HTTOPRIGHT = 14;      // Top-right corner (diagonal resize cursor)
+    public const int HTBOTTOM = 15;        // Bottom border (vertical resize cursor)
+    public const int HTBOTTOMLEFT = 16;    // Bottom-left corner (diagonal resize cursor)
+    public const int HTBOTTOMRIGHT = 17;   // Bottom-right corner (diagonal resize cursor)
+}
