@@ -448,12 +448,20 @@ public record WS_EX
 // https://learn.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute
 public record DWMWA
 {
-    public const int DwmwaUseImmersiveDarkModeBefore20h1 = 19;
-    public const int DwmwaUseImmersiveDarkMode = 20;
-    public const int DwmwaBorderColor = 34;
-    public const int DwmwaCaptionColor = 35;
-    public const int DwmwaTextColor = 36;
-    public const int DwmwaSystemBackdropType = 38;
+    public const int DWMWA_NCRENDERING_ENABLED = 1;
+    public const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+    public const int DWMWA_BORDER_COLOR = 34;
+    public const int DWMWA_CAPTION_COLOR = 35;
+    public const int DWMWA_TEXT_COLOR = 36;
+    public const int DWMWA_SYSTEMBACKDROP_TYPE = 38;
+}
+
+
+public record DWM_BB
+{
+    public const int DWM_BB_ENABLE = 1;
+    public const int DWM_BB_BLURREGION = 2;
+    public const int DWM_BB_TRANSITIONONMAXIMIZED = 4;
 }
 
 public record COLORREF
@@ -485,12 +493,32 @@ public record HT
     public const int HTHSCROLL = 6;
     public const int HTVSCROLL = 7;
     public const int HTMINBUTTON = 8;
-    public const int HTLEFT = 10;          // Left border (horizontal resize cursor)
-    public const int HTRIGHT = 11;         // Right border (horizontal resize cursor)  
-    public const int HTTOP = 12;           // Top border (vertical resize cursor)
-    public const int HTTOPLEFT = 13;       // Top-left corner (diagonal resize cursor)
-    public const int HTTOPRIGHT = 14;      // Top-right corner (diagonal resize cursor)
-    public const int HTBOTTOM = 15;        // Bottom border (vertical resize cursor)
-    public const int HTBOTTOMLEFT = 16;    // Bottom-left corner (diagonal resize cursor)
-    public const int HTBOTTOMRIGHT = 17;   // Bottom-right corner (diagonal resize cursor)
+    public const int HTLEFT = 10;
+    public const int HTRIGHT = 11;
+    public const int HTTOP = 12;
+    public const int HTTOPLEFT = 13;
+    public const int HTTOPRIGHT = 14;
+    public const int HTBOTTOM = 15;
+    public const int HTBOTTOMLEFT = 16;
+    public const int HTBOTTOMRIGHT = 17;
+    public const int HTBORDER = 18;
+}
+
+public record SWP
+{
+    public const int SWP_NOSIZE = 0x0001;
+    public const int SWP_NOMOVE = 0x0002;
+    public const int SWP_NOZORDER = 0x0004;
+    public const int SWP_NOREDRAW = 0x0008;
+    public const int SWP_NOACTIVATE = 0x0010;
+    public const int SWP_FRAMECHANGED = 0x0020;
+    public const int SWP_SHOWWINDOW = 0x0040;
+    public const int SWP_HIDEWINDOW = 0x0080;
+    public const int SWP_NOCOPYBITS = 0x0100;
+    public const int SWP_NOOWNERZORDER = 0x0200;
+    public const int SWP_NOSENDCHANGING = 0x0400;
+    public const int SWP_DRAWFRAME = SWP_FRAMECHANGED;
+    public const int SWP_NOREPOSITION = SWP_NOOWNERZORDER;
+    public const int SWP_DEFERERASE = 0x2000;
+    public const int SWP_ASYNCWINDOWPOS = 0x4000;
 }

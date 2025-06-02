@@ -91,4 +91,22 @@ public class USER32
 
     [DllImport("user32.dll")]
     public extern static int FillRect(IntPtr hDC, ref RECT lprc, IntPtr hbr);
+    
+    [DllImport("user32.dll")]
+    public extern static int GetWindowLongPtr(IntPtr hWnd, int nIndex);
+    
+    [DllImport("user32.dll")]
+    public extern static int SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+    
+    [DllImport("user32.dll")]
+    public extern static int SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+    
+    [DllImport("user32.dll")]
+    public extern static int GetCursorPos(out POINT lpPoint);
+    
+    [DllImport("user32.dll")]
+    public extern static int SetCursorPos(int X, int Y);
+    
+    [DllImport("user32.dll")]
+    public extern static int ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
 }

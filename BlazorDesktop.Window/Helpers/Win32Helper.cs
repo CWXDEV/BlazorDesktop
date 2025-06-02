@@ -10,13 +10,7 @@ public class Win32Helper
 {
 
     #region CreationMethods
-
-    /// <summary>
-    /// Wrapper to create and return a WNDCLASSEX
-    /// </summary>
-    /// <param name="wndProc"></param>
-    /// <param name="appOptionsTitle"></param>
-    /// <param name="appOptionsBackgroundColour"></param>
+    
     public static WNDCLASSEX CreateWindowClass(Func<IntPtr, uint, IntPtr, IntPtr, IntPtr> wndProc, string appOptionsTitle, RGB appOptionsBackgroundColour)
     {
         var test = new WNDCLASSEX
@@ -32,24 +26,12 @@ public class Win32Helper
 
         return test;
     }
-
-    /// <summary>
-    /// Wrapper to register WNDCLASSEX
-    /// </summary>
-    /// <param name="wndClass"></param>
+    
     public static ushort RegisterWindowClass(ref WNDCLASSEX wndClass)
     {
         return USER32.RegisterClassEx(ref wndClass);
     }
-
-    /// <summary>
-    /// Wrapper to create window handle
-    /// </summary>
-    /// <param name="exStyles"></param>
-    /// <param name="appOptions"></param>
-    /// <param name="dwStyle"></param>
-    /// <param name="startLocation"></param>
-    /// <param name="instanceHandle"></param>
+    
     public static nint CreateWindowHandle(int exStyles, AppOptions appOptions, int dwStyle, POINT startLocation, nint instanceHandle)
     {
         return USER32.CreateWindowEx(
@@ -96,25 +78,31 @@ public class Win32Helper
     public static int SetDarkMode(IntPtr handle, bool darkMode)
     {
         var winDark = darkMode ? 1 : 0;
-        return DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaUseImmersiveDarkMode, ref winDark, sizeof(uint));
+        return DWM.DwmSetWindowAttribute(handle, DWMWA.DWMWA_USE_IMMERSIVE_DARK_MODE, ref winDark, sizeof(uint));
     }
 
     public static int SetTitleBarCaptionColor(IntPtr handle, RGB rgb)
     {
         var titleBarColor = (int) RGBToUInt(rgb);
-        return DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaCaptionColor, ref titleBarColor, sizeof(int));
+        return DWM.DwmSetWindowAttribute(handle, DWMWA.DWMWA_CAPTION_COLOR, ref titleBarColor, sizeof(int));
     }
 
     public static int SetTitleBarTextColor(IntPtr handle, RGB rgb)
     {
         var titleTextColor = (int) RGBToUInt(rgb);
-        return DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaTextColor, ref titleTextColor, sizeof(int));
+        return DWM.DwmSetWindowAttribute(handle, DWMWA.DWMWA_TEXT_COLOR, ref titleTextColor, sizeof(int));
     }
 
     public static int SetTitleBarBorderColor(IntPtr handle, RGB rgb)
     {
         var titleBorderColor = (int) RGBToUInt(rgb);
-        return DWM.DwmSetWindowAttribute(handle, DWMWA.DwmwaBorderColor, ref titleBorderColor, sizeof(int));
+        return DWM.DwmSetWindowAttribute(handle, DWMWA.DWMWA_BORDER_COLOR, ref titleBorderColor, sizeof(int));
+    }
+
+    public static int SetDWMRender(IntPtr handle, bool enabled)
+    {
+        var dwmRender = enabled ? 1 : 0;
+        return DWM.DwmSetWindowAttribute(handle, DWMWA.DWMWA_NCRENDERING_ENABLED, ref dwmRender, sizeof(uint));
     }
 
     #endregion

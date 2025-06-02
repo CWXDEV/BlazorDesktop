@@ -10,4 +10,7 @@ public class DWM
     
     [DllImport("dwmapi.dll")]
     public extern static int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+    
+    [DllImport("dwmapi.dll", PreserveSig = true)]
+    public extern static int DwmEnableBlurBehindWindow(IntPtr hwnd, ref BLURBEHIND pBlurBehind);
 }

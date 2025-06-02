@@ -15,13 +15,13 @@ public class Program
             Title = "Testing Project for creating windows",
             Width = 800,
             Height = 600,
-            ClientAreaTransparent = false,
+            ClientAreaTransparent = true,
             DarkMode = true,
             Frameless = true
         };
-        
+
         var app = new BlazorApp(appOptions);
-        
+
         app.Run();
     }
 }
