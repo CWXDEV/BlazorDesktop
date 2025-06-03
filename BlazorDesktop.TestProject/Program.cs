@@ -13,11 +13,10 @@ public class Program
         var appOptions = new AppOptions
         {
             Title = "Testing Project for creating windows",
-            Width = 800,
-            Height = 600,
-            ClientAreaTransparent = true,
-            DarkMode = true,
-            Frameless = true
+            WindowStyle = WindowStyle.FramelessWindowWithBorder,
+            DarkMode = false,
+            TranslucentWindow = true,
+            WindowBackdropType = WindowBackdropType.Acrylic
         };
 
         var app = new BlazorApp(appOptions);

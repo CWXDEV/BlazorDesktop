@@ -13,9 +13,6 @@ public class WindowManager
     private IntPtr _handle;
     private AppOptions _appOptions;
     // private CoreWebView2Controller webViewController;
-    private int _currentCornerRadius = 8;
-    private uint _currentBorderColor = 0x808080;
-    private int _currentBorderWidth = 1;
 
     public async Task<IntPtr> CreateWindow(AppOptions appOptions)
     {
@@ -27,109 +24,53 @@ public class WindowManager
             _appOptions.BackgroundColour = new RGB(0, 0, 0);
         }
 
-        var windowClass = Win32Helper.CreateWindowClass(
+        var windowClass = Win.CreateWindowClass(
             WndProc,
             _appOptions.Title,
             _appOptions.BackgroundColour
         );
 
-        var classAtom = Win32Helper.RegisterWindowClass(ref windowClass);
+        var classAtom = Win.RegisterWindowClass(ref windowClass);
         if (classAtom == 0)
         {
             Console.WriteLine("Error registering window class.");
             return IntPtr.Zero;
         }
 
-        var exStyle = CS.CS_HREDRAW | CS.CS_VREDRAW;
-        if (_appOptions.AlwaysOnTop)
-        {
-            exStyle |= WS_EX.WS_EX_TOPMOST;
-        }
-        if (_appOptions.ClientAreaTransparent)
-        {
-            exStyle |= WS_EX.WS_EX_NOREDIRECTIONBITMAP;
-        }
+        var exStyle = Win.GetEXStyle(_appOptions);
+        var startingLocation = Win.GetStartingLocation(_appOptions);
+        var dwStyle = Win.GetDWStyle(_appOptions);
 
-        var startingLocation = new POINT(0, 0);
-        if (_appOptions.StartPosition == StartPosition.Manual)
-        {
-            if (_appOptions.Top is not null)
-            {
-                startingLocation.Y = _appOptions.Top.Value;
-            }
-
-            if (_appOptions.Left is not null)
-            {
-                startingLocation.X = _appOptions.Left.Value;
-            }
-        }
-        else
-        {
-            startingLocation = Win32Helper.GetScreenCentre(_appOptions);
-        }
-
-        var dwStyle = WS.WS_OVERLAPPEDWINDOW | WS.WS_VISIBLE;
-
-        if (_appOptions.Frameless)
-        {
-            dwStyle = WS.WS_POPUP | WS.WS_THICKFRAME | WS.WS_VISIBLE;
-        }
-
-        _handle = Win32Helper.CreateWindowHandle(
+        _handle = Win.CreateWindowHandle(
             exStyle,
             _appOptions,
             dwStyle,
             startingLocation,
             windowClass.hInstance
         );
-
         _appOptions.Handle = _handle;
 
         if (_handle == IntPtr.Zero)
         {
-            var errorCode = Win32Helper.LastError();
+            var errorCode = Win.LastError();
             Console.WriteLine($"Error creating window. Error Code: {errorCode}");
             return IntPtr.Zero;
         }
-
-        Win32Helper.SetDarkMode(_handle, _appOptions.DarkMode);
-
-        if (_appOptions.CustomTitleBar)
-        {
-            if (_appOptions.TitleBarColor is not null)
-            {
-                Win32Helper.SetTitleBarCaptionColor(_handle, _appOptions.TitleBarColor);
-            }
-
-            if (_appOptions.TitleTextColor is not null)
-            {
-                Win32Helper.SetTitleBarTextColor(_handle, _appOptions.TitleTextColor);
-            }
-
-            if (_appOptions.TitleBorderColor is not null)
-            {
-                Win32Helper.SetTitleBarBorderColor(_handle, _appOptions.TitleBorderColor);
-            }
-        }
-
-        // var test = USER32.GetWindowLongPtr(_handle, GWL.GWL_STYLE);
-        // test &= ~WS.WS_CAPTION;
-        // USER32.SetWindowLongPtr(_handle, GWL.GWL_STYLE, test);
-        // USER32.SetWindowPos(_handle, default, 0, 0, 0, 0, SWP.SWP_NOMOVE | SWP.SWP_NOSIZE | SWP.SWP_NOZORDER | SWP.SWP_FRAMECHANGED);
-
-        USER32.ShowWindow(_handle, SW.SW_SHOW);
-        USER32.UpdateWindow(_handle);
+        
+        Win.SetWindowTheme(_handle, _appOptions);
+        Win.SetTranslucencyType(_handle, _appOptions.WindowBackdropType);
+        Win.SetWindowState(_handle, SW.SW_SHOW);
+        Win.UpdateWindow(_handle);
 
         return _handle;
     }
 
     public void Run()
     {
-        MSG msg;
-        while (USER32.GetMessage(out msg, IntPtr.Zero, 0, 0))
+        while (Win.GetMessage(out var msg))
         {
-            USER32.TranslateMessage(ref msg);
-            USER32.DispatchMessage(ref msg);
+            Win.TranslateMessage(ref msg);
+            Win.DispatchMessage(ref msg);
         }
     }
 
@@ -169,15 +110,14 @@ public class WindowManager
                 return IntPtr.Zero;
         }
 
-        if (_appOptions.Frameless)
+        if (_appOptions.WindowStyle == WindowStyle.FramelessWindowWithBorder)
         {
             switch (msg)
             {
                 case WM.WM_ACTIVATE:
-                    ApplyFramelessStyling(hWnd);
+                    Win.SetFramelessStyling(hWnd);
                     return IntPtr.Zero;
                 case WM.WM_NCACTIVATE:
-                    // ApplyFramelessStyling(hWnd);
                     return new IntPtr(1);
                 case WM.WM_NCCALCSIZE:
                     // Remove all non-client area
@@ -187,7 +127,7 @@ public class WindowManager
                     }
                     break;
                 case WM.WM_CREATE:
-                    ApplyFramelessStyling(hWnd);
+                    Win.SetFramelessStyling(hWnd);
                     return IntPtr.Zero;
                 case WM.WM_NCHITTEST:
                     var result = USER32.DefWindowProc(hWnd, msg, wParam, lParam);
@@ -202,7 +142,7 @@ public class WindowManager
                             USER32.ScreenToClient(hWnd, ref cursorPos);
                             USER32.GetClientRect(hWnd, out var windowRect);
 
-                            var borderWidth = 5;
+                            var borderWidth = 4;
                             
                             var left = cursorPos.X < borderWidth;
                             var right = cursorPos.X > windowRect.Right - borderWidth;
@@ -225,19 +165,5 @@ public class WindowManager
         }
 
         return USER32.DefWindowProc(hWnd, msg, wParam, lParam);
-    }
-
-    private void ApplyFramelessStyling(IntPtr hWnd)
-    {
-        var margins = new MARGINS
-        {
-            cxLeftWidth = 1,
-            cxRightWidth = 1,
-            cyTopHeight = 1,
-            cyBottomHeight = 1
-        };
-        DWM.DwmExtendFrameIntoClientArea(hWnd, ref margins);
-
-        USER32.InvalidateRect(hWnd, IntPtr.Zero, true);
     }
 }
